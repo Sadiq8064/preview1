@@ -48,7 +48,7 @@
             height: 100%;
             background: #030303;
             color: #ffffff;
-            overflow: hidden;
+            overflow: hidden; /* Prevent scrollbars */
             animation: slideInFromRight 0.5s ease-out forwards;
         }
 
@@ -84,7 +84,6 @@
             padding: 8px 12px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.9em;
         }
 
         .back-btn {
@@ -165,17 +164,30 @@
             gap: 5px;
         }
 
-        .saved-card .delete-btn {
+        .saved-card .edit-btn,
+        .saved-card .delete-btn,
+        .saved-card .cancel-btn {
             background: none;
             border: none;
             font-size: 1em;
             cursor: pointer;
-            color: #dc3545;
             transition: color 0.3s ease;
         }
 
-        .saved-card .delete-btn:hover {
-            color: #ff5555;
+        .saved-card .edit-btn {
+            color: #1e3a8a;
+        }
+
+        .saved-card .edit-btn:hover {
+            color: #ffffff;
+        }
+
+        .saved-card .delete-btn {
+            color: #dc3545;
+        }
+
+        .saved-card .cancel-btn {
+            color: #28a745;
         }
 
         .main-content {
@@ -184,32 +196,28 @@
             display: flex;
             flex-direction: column;
             transition: margin-left 0.3s ease;
+            overflow: hidden; /* Prevent scrollbars */
         }
 
         .main-content.active {
             margin-left: 0;
         }
 
-        .menu-btn {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: #1e3a8a;
-            color: #ffffff;
-            border: none;
-            font-size: 1.5em;
-            cursor: pointer;
-            z-index: 1100;
-            display: none;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            transition: background 0.3s ease;
+        .header {
+            flex-shrink: 0;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            background: #030303;
         }
 
-        .menu-btn:hover {
-            background: #152c5b;
+        .menu-btn {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #1e3a8a;
+            cursor: pointer;
+            display: none;
         }
 
         #main-area {
@@ -226,6 +234,7 @@
             margin: 0;
             padding: 0;
             display: block;
+            min-height: 0;
         }
 
         /* Modal styles */
@@ -248,7 +257,8 @@
             border-radius: 8px;
             width: 90%;
             max-width: 400px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            max-height: 80vh;
+            overflow-y: auto;
         }
 
         .modal-header {
@@ -273,7 +283,6 @@
         .form-group label {
             display: block;
             margin-bottom: 5px;
-            font-size: 0.9em;
         }
 
         .form-group input {
@@ -283,30 +292,28 @@
             border: 1px solid #1e3a8a;
             color: white;
             border-radius: 4px;
-            font-size: 0.9em;
         }
 
         .save-course {
             background: #1e3a8a;
             color: white;
             border: none;
-            padding: 10px;
+            padding: 8px 15px;
             border-radius: 4px;
             cursor: pointer;
             width: 100%;
-            font-size: 1em;
-            transition: background 0.3s ease;
         }
 
-        .save-course:hover {
-            background: #152c5b;
+        /* Hide menu icon when drawer is active */
+        .nav-drawer.active + .main-content .menu-btn {
+            display: none;
         }
 
         @media (max-width: 768px) {
             .nav-drawer {
                 transform: translateX(-100%);
                 width: 80%;
-                max-width: 300px;
+                max-width: 280px;
             }
 
             .nav-drawer.active {
@@ -321,42 +328,19 @@
                 display: block;
             }
 
+            #main-area {
+                height: 100%;
+                overflow: hidden;
+            }
+
             #main-area iframe {
                 height: 100%;
+                width: 100%;
+                position: relative;
             }
 
-            .drawer-header {
-                padding: 15px;
-            }
-
-            .add-course-btn {
-                padding: 8px 10px;
-                font-size: 0.85em;
-            }
-
-            .back-btn {
-                width: 35px;
-                height: 35px;
-                font-size: 1em;
-            }
-
-            .saved-card {
-                padding: 8px;
-                margin-bottom: 8px;
-            }
-
-            .saved-card .icon {
-                width: 28px;
-                height: 28px;
-                font-size: 0.9em;
-            }
-
-            .saved-card .info h5 {
-                font-size: 0.85em;
-            }
-
-            .saved-card .info p {
-                font-size: 0.75em;
+            body.drawer-open {
+                overflow: hidden;
             }
         }
     </style>
@@ -378,9 +362,11 @@
     </div>
 
     <div class="main-content">
-        <button class="menu-btn" id="menu-btn">
-            <i class="fa-solid fa-stream"></i>
-        </button>
+        <div class="header">
+            <button class="menu-btn" id="menu-btn" aria-label="Open navigation drawer">
+                <i class="fa-solid fa-stream"></i>
+            </button>
+        </div>
         <div id="main-area">
             <iframe id="course-frame" src="about:blank" title="Courses Webview" sandbox="allow-scripts allow-same-origin"></iframe>
         </div>
@@ -432,15 +418,23 @@
             const saveCourseBtn = document.getElementById('save-course');
             const courseNameInput = document.getElementById('course-name');
 
+            // Toggle drawer and manage body scroll
             menuBtn.addEventListener('click', () => {
                 navDrawer.classList.toggle('active');
                 mainContent.classList.toggle('active');
+                document.body.classList.toggle('drawer-open');
             });
 
+            // Close drawer on outside click
             document.addEventListener('click', (e) => {
-                if (!navDrawer.contains(e.target) && !menuBtn.contains(e.target) && navDrawer.classList.contains('active')) {
+                if (
+                    !navDrawer.contains(e.target) &&
+                    !menuBtn.contains(e.target) &&
+                    navDrawer.classList.contains('active')
+                ) {
                     navDrawer.classList.remove('active');
                     mainContent.classList.remove('active');
+                    document.body.classList.remove('drawer-open');
                 }
             });
 
@@ -463,7 +457,7 @@
                 }
             });
 
-            // Close modal when clicking outside
+            // Close modal on outside click
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
                     modal.style.display = 'none';
@@ -506,6 +500,7 @@
         function loadCourse(course) {
             const iframe = document.getElementById('course-frame');
 
+            // Reset iframe
             iframe.src = 'about:blank';
             iframe.remove();
             const newIframe = document.createElement('iframe');
@@ -513,20 +508,23 @@
             newIframe.title = 'Courses Webview';
             newIframe.sandbox = 'allow-scripts allow-same-origin';
             newIframe.style.width = '100%';
-            newIframe.style.height = '100vh';
+            newIframe.style.height = '100%';
             newIframe.style.border = 'none';
             newIframe.style.margin = '0';
             newIframe.style.padding = '0';
             newIframe.style.display = 'block';
             document.getElementById('main-area').appendChild(newIframe);
 
+            // Load URL with cache-buster
             setTimeout(() => {
                 newIframe.src = course.url + '&t=' + Date.now();
             }, 10);
 
+            // Close drawer on mobile
             if (window.innerWidth <= 768) {
                 document.getElementById('nav-drawer').classList.remove('active');
                 document.querySelector('.main-content').classList.remove('active');
+                document.body.classList.remove('drawer-open');
             }
         }
 
@@ -555,6 +553,7 @@
                     </div>
                 `;
 
+                // Click on card loads the course
                 card.addEventListener('click', (e) => {
                     if (!e.target.closest('.action-btns')) {
                         loadCourse(course);
@@ -564,6 +563,7 @@
                 savedList.appendChild(card);
             });
 
+            // Delete button functionality
             document.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -577,6 +577,7 @@
             });
         }
 
+        // Load first course by default if available
         renderSavedCourses();
         if (savedCourses.length > 0) {
             loadCourse(savedCourses[0]);
