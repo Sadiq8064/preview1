@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -363,6 +363,559 @@
         }
 
         renderSavedSubjects();
+    </script>
+</body>
+</html>
+ -->
+
+
+
+
+
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1e3a8a">
+    <title>Smart BVB - Courses</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" href="/images/logo-192x192.png" type="image/png" sizes="192x192">
+    <link rel="manifest" href="manifest.json">
+    <script async data-id="101480021" src="//static.getclicky.com/js"></script>
+
+    <style>
+        /* Animation for sliding in from right to left */
+        @keyframes slideInFromRight {
+            from {
+                transform: translateX(100%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        /* Animation for sliding out from left to right */
+        @keyframes slideOutToRight {
+            from {
+                transform: translateX(0);
+            }
+            to {
+                transform: translateX(100%);
+            }
+        }
+
+        /* Class for sliding out */
+        .sliding-out {
+            animation: slideOutToRight 0.5s ease-in forwards;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: #030303;
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            animation: slideInFromRight 0.5s ease-out forwards;
+        }
+
+        .nav-drawer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100%;
+            background: #000000;
+            color: #ffffff;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #1e3a8a;
+        }
+
+        .drawer-header {
+            padding: 20px;
+            background: #111;
+            border-bottom: 1px solid #1e3a8a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .add-course-btn {
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #1e3a8a;
+            color: #ffffff;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #152c5b;
+        }
+
+        .saved-subjects {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .saved-subjects h4 {
+            font-size: 1em;
+            margin: 0 0 15px;
+            text-transform: uppercase;
+            opacity: 0.7;
+            color: #1e3a8a;
+        }
+
+        .saved-card {
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-bottom: 10px;
+            background: #111;
+        }
+
+        .saved-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .saved-card .icon {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1em;
+        }
+
+        .saved-card .info {
+            flex: 1;
+        }
+
+        .saved-card .info h5 {
+            font-size: 0.9em;
+            margin: 0;
+            color: #ffffff;
+        }
+
+        .saved-card .info p {
+            font-size: 0.8em;
+            color: #cccccc;
+            margin: 0;
+        }
+
+        .saved-card .action-btns {
+            display: flex;
+            gap: 5px;
+        }
+
+        .saved-card .edit-btn,
+        .saved-card .delete-btn,
+        .saved-card .cancel-btn {
+            background: none;
+            border: none;
+            font-size: 1em;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .saved-card .edit-btn {
+            color: #1e3a8a;
+        }
+
+        .saved-card .edit-btn:hover {
+            color: #ffffff;
+        }
+
+        .saved-card .delete-btn {
+            color: #dc3545;
+        }
+
+        .saved-card .cancel-btn {
+            color: #28a745;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.active {
+            margin-left: 0;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #1e3a8a;
+            cursor: pointer;
+            display: none;
+        }
+
+        #main-area iframe {
+            width: 100%;
+            height: calc(100vh - 60px);
+            border: none;
+            margin: 0;
+            padding: 0;
+            display: block;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #111;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            background: #222;
+            border: 1px solid #1e3a8a;
+            color: white;
+            border-radius: 4px;
+        }
+
+        .save-course {
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .nav-drawer {
+                transform: translateX(-100%);
+            }
+
+            .nav-drawer.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-btn {
+                display: block;
+            }
+
+            #main-area iframe {
+                height: calc(100vh - 80px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-drawer" id="nav-drawer">
+        <div class="drawer-header">
+            <button class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <button class="add-course-btn" id="add-course-btn">
+                <i class="fa-solid fa-plus"></i> Add Course
+            </button>
+        </div>
+        <div class="saved-subjects">
+            <h4>Saved Courses</h4>
+            <div id="saved-list"></div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <button class="menu-btn" id="menu-btn">
+                <i class="fa-solid fa-stream"></i>
+            </button>
+        </div>
+        <div id="main-area">
+            <iframe id="course-frame" src="about:blank" title="Courses Webview" sandbox="allow-scripts allow-same-origin"></iframe>
+        </div>
+    </div>
+
+    <!-- Add Course Modal -->
+    <div class="modal" id="course-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Course</h3>
+                <button class="close-modal">×</button>
+            </div>
+            <div class="form-group">
+                <label for="course-name">Course Name</label>
+                <input type="text" id="course-name" placeholder="Enter course name">
+            </div>
+            <button class="save-course" id="save-course">Save Course</button>
+        </div>
+    </div>
+
+    <script>
+        // Icon colors for saved courses
+        const iconColors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD', '#D4A5A5', '#9B59B6', '#3498DB'];
+        const icons = ['fa-book', 'fa-laptop-code', 'fa-calculator', 'fa-flask', 'fa-paint-brush', 'fa-music', 'fa-globe', 'fa-chart-line'];
+
+        // Function to get a random color and ensure no duplicates
+        function getRandomUniqueColor(usedColors) {
+            const availableColors = iconColors.filter(color => !usedColors.includes(color));
+            if (availableColors.length === 0) return iconColors[Math.floor(Math.random() * iconColors.length)];
+            const randomIndex = Math.floor(Math.random() * availableColors.length);
+            const color = availableColors[randomIndex];
+            usedColors.push(color);
+            return color;
+        }
+
+        // Function to get a random icon
+        function getRandomIcon() {
+            return icons[Math.floor(Math.random() * icons.length)];
+        }
+
+        // Navigation drawer toggle
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuBtn = document.getElementById('menu-btn');
+            const navDrawer = document.getElementById('nav-drawer');
+            const mainContent = document.querySelector('.main-content');
+            const addCourseBtn = document.getElementById('add-course-btn');
+            const modal = document.getElementById('course-modal');
+            const closeModal = document.querySelector('.close-modal');
+            const saveCourseBtn = document.getElementById('save-course');
+            const courseNameInput = document.getElementById('course-name');
+
+            menuBtn.addEventListener('click', () => {
+                navDrawer.classList.toggle('active');
+                mainContent.classList.toggle('active');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!navDrawer.contains(e.target) && !menuBtn.contains(e.target) && navDrawer.classList.contains('active')) {
+                    navDrawer.classList.remove('active');
+                    mainContent.classList.remove('active');
+                }
+            });
+
+            // Modal handling
+            addCourseBtn.addEventListener('click', () => {
+                modal.style.display = 'flex';
+                courseNameInput.focus();
+            });
+
+            closeModal.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+
+            saveCourseBtn.addEventListener('click', () => {
+                const courseName = courseNameInput.value.trim();
+                if (courseName) {
+                    addNewCourse(courseName);
+                    courseNameInput.value = '';
+                    modal.style.display = 'none';
+                }
+            });
+
+            // Close modal when clicking outside
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+
+        // Back button animation
+        document.querySelector('.back-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.body.classList.add('sliding-out');
+            setTimeout(() => {
+                history.back();
+            }, 500);
+        });
+
+        // Saved courses functionality
+        let savedCourses = JSON.parse(localStorage.getItem('savedCourses')) || [];
+
+        function addNewCourse(name) {
+            const usedColors = savedCourses.map(course => course.iconColor);
+            const courseId = 'course_' + Date.now(); // Unique ID for each course
+
+            // Use a unique storage key to namespace localStorage
+            const storageKey = `klebotc_${courseId}`;
+            const newCourse = {
+                id: courseId,
+                title: name,
+                icon: `fa-solid ${getRandomIcon()}`,
+                iconColor: getRandomUniqueColor(usedColors),
+                url: `https://sadiq8064.github.io/klebotc/?course=${courseId}&storageKey=${storageKey}`,
+                date: new Date().toLocaleDateString()
+            };
+
+            savedCourses.push(newCourse);
+            localStorage.setItem('savedCourses', JSON.stringify(savedCourses));
+            renderSavedCourses();
+            loadCourse(newCourse); // Load immediately after creation
+        }
+
+        function loadCourse(course) {
+            const iframe = document.getElementById('course-frame');
+
+            // Completely reset the iframe to ensure no residual state
+            iframe.src = 'about:blank';
+            iframe.remove(); // Remove the iframe from DOM
+            const newIframe = document.createElement('iframe');
+            newIframe.id = 'course-frame';
+            newIframe.title = 'Courses Webview';
+            newIframe.sandbox = 'allow-scripts allow-same-origin';
+            newIframe.style.width = '100%';
+            newIframe.style.height = 'calc(100vh - 60px)';
+            newIframe.style.border = 'none';
+            newIframe.style.margin = '0';
+            newIframe.style.padding = '0';
+            newIframe.style.display = 'block';
+            document.getElementById('main-area').appendChild(newIframe);
+
+            // Load the course URL with a cache-buster
+            setTimeout(() => {
+                newIframe.src = course.url + '&t=' + Date.now();
+            }, 10);
+
+            // Close drawer on mobile
+            if (window.innerWidth <= 768) {
+                document.getElementById('nav-drawer').classList.remove('active');
+                document.querySelector('.main-content').classList.remove('active');
+            }
+        }
+
+        function renderSavedCourses() {
+            const savedList = document.getElementById('saved-list');
+            savedList.innerHTML = '';
+
+            if (savedCourses.length === 0) {
+                savedList.innerHTML = '<p style="color: #666; text-align: center;">No courses added yet</p>';
+                return;
+            }
+
+            const usedColors = [];
+            savedCourses.forEach((course, index) => {
+                if (!course.iconColor) course.iconColor = getRandomUniqueColor(usedColors);
+                const card = document.createElement('div');
+                card.className = 'saved-card';
+                card.innerHTML = `
+                    <div class="icon" style="color: ${course.iconColor}"><i class="${course.icon}"></i></div>
+                    <div class="info">
+                        <h5>${course.title}</h5>
+                        <p>Created: ${course.date}</p>
+                    </div>
+                    <div class="action-btns">
+                        <button class="delete-btn" data-id="${course.id}"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+
+                // Click on card loads the course
+                card.addEventListener('click', (e) => {
+                    if (!e.target.closest('.action-btns')) {
+                        loadCourse(course);
+                    }
+                });
+
+                savedList.appendChild(card);
+            });
+
+            // Delete button functionality
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = btn.dataset.id;
+                    if (confirm('Are you sure you want to delete this course?')) {
+                        savedCourses = savedCourses.filter(course => course.id !== id);
+                        localStorage.setItem('savedCourses', JSON.stringify(savedCourses));
+                        renderSavedCourses();
+                    }
+                });
+            });
+        }
+
+        // Load first course by default if available
+        renderSavedCourses();
+        if (savedCourses.length > 0) {
+            loadCourse(savedCourses[0]);
+        }
     </script>
 </body>
 </html>
