@@ -52,6 +52,39 @@
             animation: slideInFromRight 0.5s ease-out forwards;
         }
 
+        .mobile-message {
+            display: none;
+            background: #111;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-width: 90%;
+            width: 400px;
+            border: 1px solid #1e3a8a;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3000;
+        }
+
+        .mobile-message h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #1e3a8a;
+        }
+
+        .mobile-message p {
+            font-size: 1em;
+            color: #cccccc;
+        }
+
+        .app-content {
+            display: block;
+        }
+
         .nav-drawer {
             position: fixed;
             top: 0;
@@ -309,6 +342,17 @@
             display: none;
         }
 
+        /* Media queries for non-laptop devices */
+        @media (max-width: 1024px), (hover: none), (pointer: coarse) {
+            .app-content {
+                display: none;
+            }
+
+            .mobile-message {
+                display: block;
+            }
+        }
+
         @media (max-width: 768px) {
             .nav-drawer {
                 transform: translateX(-100%);
@@ -346,44 +390,51 @@
     </style>
 </head>
 <body>
-    <div class="nav-drawer" id="nav-drawer">
-        <div class="drawer-header">
-            <button class="back-btn">
-                <i class="fa-solid fa-arrow-left"></i>
-            </button>
-            <button class="add-course-btn" id="add-course-btn">
-                <i class="fa-solid fa-plus"></i> Add Course
-            </button>
-        </div>
-        <div class="saved-subjects">
-            <h4>Saved Courses</h4>
-            <div id="saved-list"></div>
-        </div>
+    <div class="mobile-message">
+        <h2>Access Restricted</h2>
+        <p>This feature is only available on laptops. Please access the site using a laptop to view the courses.</p>
     </div>
 
-    <div class="main-content">
-        <div class="header">
-            <button class="menu-btn" id="menu-btn" aria-label="Open navigation drawer">
-                <i class="fa-solid fa-stream"></i>
-            </button>
+    <div class="app-content">
+        <div class="nav-drawer" id="nav-drawer">
+            <div class="drawer-header">
+                <button class="back-btn">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <button class="add-course-btn" id="add-course-btn">
+                    <i class="fa-solid fa-plus"></i> Add Course
+                </button>
+            </div>
+            <div class="saved-subjects">
+                <h4>Saved Courses</h4>
+                <div id="saved-list"></div>
+            </div>
         </div>
-        <div id="main-area">
-            <iframe id="course-frame" src="about:blank" title="Courses Webview" sandbox="allow-scripts allow-same-origin"></iframe>
-        </div>
-    </div>
 
-    <!-- Add Course Modal -->
-    <div class="modal" id="course-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Add New Course</h3>
-                <button class="close-modal">×</button>
+        <div class="main-content">
+            <div class="header">
+                <button class="menu-btn" id="menu-btn" aria-label="Open navigation drawer">
+                    <i class="fa-solid fa-stream"></i>
+                </button>
             </div>
-            <div class="form-group">
-                <label for="course-name">Course Name</label>
-                <input type="text" id="course-name" placeholder="Enter course name">
+            <div id="main-area">
+                <iframe id="course-frame" src="about:blank" title="Courses Webview" sandbox="allow-scripts allow-same-origin"></iframe>
             </div>
-            <button class="save-course" id="save-course">Save Course</button>
+        </div>
+
+        <!-- Add Course Modal -->
+        <div class="modal" id="course-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Add New Course</h3>
+                    <button class="close-modal">×</button>
+                </div>
+                <div class="form-group">
+                    <label for="course-name">Course Name</label>
+                    <input type="text" id="course-name" placeholder="Enter course name">
+                </div>
+                <button class="save-course" id="save-course">Save Course</button>
+            </div>
         </div>
     </div>
 
